@@ -8,12 +8,12 @@ import java.util.List;
 import org.eluder.juniter.core.TestLifeCycle;
 import org.junit.runners.model.FrameworkMethod;
 
-public class MagicFrameWorkMethod extends FrameworkMethod {
+public class LifeCycleHoldingMethod extends FrameworkMethod {
 
     private final FrameworkMethod delegate;
     private final List<TestLifeCycle> testLifeCycles;
 
-    public MagicFrameWorkMethod(final FrameworkMethod delegate, final List<TestLifeCycle> testLifeCycles) {
+    public LifeCycleHoldingMethod(final FrameworkMethod delegate, final List<TestLifeCycle> testLifeCycles) {
         super(delegate.getMethod());
         this.delegate = delegate;
         this.testLifeCycles = testLifeCycles;
