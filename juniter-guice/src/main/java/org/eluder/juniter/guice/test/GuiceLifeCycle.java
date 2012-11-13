@@ -8,6 +8,7 @@ import org.eluder.juniter.core.Mock;
 import org.eluder.juniter.core.test.BaseLifeCycle;
 import org.eluder.juniter.core.util.ReflectionUtils;
 import org.eluder.juniter.guice.GuiceContext;
+import org.eluder.juniter.guice.GuiceModules;
 import org.junit.runners.model.FrameworkField;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.TestClass;
@@ -24,12 +25,13 @@ public class GuiceLifeCycle extends BaseLifeCycle {
     @Override
     public void onBefore(final TestClass testClass, final FrameworkMethod method, final Object target) {
         GuiceContext guiceContext = testClass.getJavaClass().getAnnotation(GuiceContext.class);
+        GuiceModules guiceModules = testClass.getJavaClass().getAnnotation(GuiceModules.class);
         List<Module> modules = new ArrayList<Module>();
         if (guiceContext == null || guiceContext.bindMocks()) {
             modules.add(new MockModule(testClass.getAnnotatedFields(Mock.class), target));
         }
-        if (guiceContext != null && guiceContext.modules().length > 0) {
-            for (Class<? extends Module> module : guiceContext.modules()) {
+        if (guiceModules != null && guiceModules.modules().length > 0) {
+            for (Class<? extends Module> module : guiceModules.modules()) {
                 modules.add(ReflectionUtils.instantiate(module));
             }
         }

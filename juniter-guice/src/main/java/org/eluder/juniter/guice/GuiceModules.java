@@ -6,11 +6,13 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import com.google.inject.Module;
+
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface GuiceContext {
+public @interface GuiceModules {
 
-    boolean bindMocks() default true;
+    Class<? extends Module>[] modules() default {};
 
 }
