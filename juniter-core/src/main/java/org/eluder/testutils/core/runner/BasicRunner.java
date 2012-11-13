@@ -1,0 +1,49 @@
+package org.eluder.testutils.core.runner;
+
+import java.util.Arrays;
+import java.util.List;
+
+import org.eluder.testutils.core.TestLifeCycle;
+import org.junit.runner.Description;
+import org.junit.runner.manipulation.Filter;
+import org.junit.runner.manipulation.NoTestsRemainException;
+import org.junit.runner.notification.RunNotifier;
+import org.junit.runners.model.InitializationError;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class BasicRunner implements Runner {
+
+    private static final Logger log = LoggerFactory.getLogger(BasicRunner.class);
+
+    private TestLifeCycleBlockRunner delegate;
+
+    @Override
+    public final void init(final Class<?> testClass, final Class<? extends TestLifeCycle>... testLifeCycles) throws InitializationError {
+        delegate = createDelegate(testClass, Arrays.asList(testLifeCycles));
+        if (delegate == null) {
+            throw new InitializationError("JUnit block runner delegate not created properly");
+        } else {
+            log.debug("{} set as JUnit block runner delegate", delegate.getClass().getName());
+        }
+    }
+
+    @Override
+    public final Description getDescription() {
+        return delegate.getDescription();
+    }
+
+    @Override
+    public final void run(final RunNotifier notifier) {
+        delegate.run(notifier);
+    }
+
+    @Override
+    public final void filter(final Filter filter) throws NoTestsRemainException {
+        delegate.filter(filter);
+    }
+
+    protected TestLifeCycleBlockRunner createDelegate(final Class<?> testClass, final List<Class<? extends TestLifeCycle>> testLifeCycles) throws InitializationError {
+        return new TestLifeCycleBlockRunner(testClass, testLifeCycles);
+    }
+}
