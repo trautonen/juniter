@@ -1,6 +1,10 @@
 package org.eluder.juniter.core.util;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class ReflectionUtils {
@@ -36,6 +40,34 @@ public class ReflectionUtils {
                 return field.get(target);
             }
         });
+    }
+
+    public static <T extends Annotation> List<T> getAnnotationsRecursive(final Class<?> type, final Class<T> annotationType) {
+        List<T> annotations = new ArrayList<T>();
+        Class<?> current = type;
+        while (!Object.class.equals(current)) {
+            T annotation = current.getAnnotation(annotationType);
+            if (annotation != null) {
+                annotations.add(annotation);
+            }
+            current = current.getSuperclass();
+        }
+        return annotations;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> List<Class<T>> getDeclaredClassesRecursive(final Class<?> type, final Class<T> ofType, final boolean noAbstract) {
+        List<Class<T>> declaredClasses = new ArrayList<Class<T>>();
+        Class<?> current = type;
+        while (!Object.class.equals(current)) {
+            for (Class<?> declaredClass : current.getDeclaredClasses()) {
+                if ((!noAbstract || !Modifier.isAbstract(declaredClass.getModifiers())) && (ofType == null || ofType.isAssignableFrom(declaredClass))) {
+                    declaredClasses.add((Class<T>) declaredClass);
+                }
+            }
+            current = current.getSuperclass();
+        }
+        return declaredClasses;
     }
 
     private static Object doAsAccessible(final Field field, final AsAccessible asAccessible) {

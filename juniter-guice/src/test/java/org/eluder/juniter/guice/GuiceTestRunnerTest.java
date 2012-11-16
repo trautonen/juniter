@@ -6,7 +6,6 @@ import java.nio.channels.Channel;
 import junit.framework.Assert;
 
 import org.eluder.juniter.core.Mock;
-import org.eluder.juniter.guice.GuiceTestRunnerTest.TestModule;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,7 +17,6 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 
 @RunWith(GuiceTestRunner.class)
-@GuiceModules(modules = { TestModule.class })
 public class GuiceTestRunnerTest {
 
     @Mock

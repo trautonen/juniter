@@ -1,10 +1,13 @@
 package org.eluder.juniter.guice.test;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.eluder.juniter.core.Mock;
+import org.eluder.juniter.core.TestLifeCycleException;
 import org.eluder.juniter.core.test.BaseLifeCycle;
 import org.eluder.juniter.core.util.ReflectionUtils;
 import org.eluder.juniter.guice.GuiceContext;
@@ -24,19 +27,68 @@ public class GuiceLifeCycle extends BaseLifeCycle {
 
     @Override
     public void onBefore(final TestClass testClass, final FrameworkMethod method, final Object target) {
-        GuiceContext guiceContext = testClass.getJavaClass().getAnnotation(GuiceContext.class);
-        GuiceModules guiceModules = testClass.getJavaClass().getAnnotation(GuiceModules.class);
         List<Module> modules = new ArrayList<Module>();
+        GuiceContext guiceContext = getGuiceContext(testClass, method);
+        verifyGuiceContext(guiceContext);
         if (guiceContext == null || guiceContext.bindMocks()) {
             modules.add(new MockModule(testClass.getAnnotatedFields(Mock.class), target));
         }
-        if (guiceModules != null && guiceModules.modules().length > 0) {
-            for (Class<? extends Module> module : guiceModules.modules()) {
-                modules.add(ReflectionUtils.instantiate(module));
-            }
+        List<Class<? extends Module>> guiceModules = getGuiceModules(testClass, method);
+        verifyGuiceModules(guiceModules);
+        for (Class<? extends Module> guiceModule : guiceModules) {
+            modules.add(ReflectionUtils.instantiate(guiceModule));
         }
         Injector injector = Guice.createInjector(modules);
         injector.injectMembers(target);
+    }
+
+    private List<Class<? extends Module>> getGuiceModules(final TestClass testClass, final FrameworkMethod method) {
+        List<Class<? extends Module>> moduleTypes = new ArrayList<Class<? extends Module>>();
+        GuiceModules methodAnnotation = method.getAnnotation(GuiceModules.class);
+        if (methodAnnotation != null) {
+            moduleTypes.addAll(Arrays.asList(methodAnnotation.value()));
+        }
+        List<GuiceModules> classAnnotations = ReflectionUtils.getAnnotationsRecursive(testClass.getJavaClass(), GuiceModules.class);
+        for (GuiceModules classAnnotation : classAnnotations) {
+            moduleTypes.addAll(Arrays.asList(classAnnotation.value()));
+        }
+        moduleTypes.addAll(ReflectionUtils.getDeclaredClassesRecursive(testClass.getJavaClass(), Module.class, true));
+        return moduleTypes;
+    }
+
+    private GuiceContext getGuiceContext(final TestClass testClass, final FrameworkMethod method) {
+        GuiceContext methodAnnotation = method.getAnnotation(GuiceContext.class);
+        if (methodAnnotation != null) {
+            return methodAnnotation;
+        }
+        List<GuiceContext> classAnnotations = ReflectionUtils.getAnnotationsRecursive(testClass.getJavaClass(), GuiceContext.class);
+        if (classAnnotations.size() > 0) {
+            return classAnnotations.get(0);
+        }
+        return null;
+    }
+
+    private void verifyGuiceContext(final GuiceContext guiceContext) {
+
+    }
+
+    private void verifyGuiceModules(final List<Class<? extends Module>> guiceModules) {
+        for (Class<? extends Module> guiceModule : guiceModules) {
+            Constructor<?>[] constructors = guiceModule.getConstructors();
+            if (constructors.length == 0) {
+                throw new TestLifeCycleException(guiceModule.getName() + " does not have a public constructor");
+            }
+            boolean zeroArg = false;
+            for (Constructor<?> constructor : constructors) {
+                if (constructor.getParameterTypes().length == 0) {
+                    zeroArg = true;
+                    break;
+                }
+            }
+            if (!zeroArg) {
+                throw new TestLifeCycleException(guiceModule.getName() + " does not have a zero arg constructor");
+            }
+        }
     }
 
     private static class MockModule extends AbstractModule {
@@ -55,7 +107,7 @@ public class GuiceLifeCycle extends BaseLifeCycle {
             for (FrameworkField mockField : mockFields) {
                 Object value = ReflectionUtils.getFieldValue(mockField.getField(), target);
                 if (value == null) {
-                    throw new IllegalStateException("Mock field " + mockField.getName() + " not initialized, is mock test life cycle run before Guice test life cycle?");
+                    throw new TestLifeCycleException("Mock field " + mockField.getName() + " not initialized, is mock test life cycle run before Guice test life cycle?");
                 } else {
                     String name = getName(mockField.getField());
                     AnnotatedBindingBuilder bindingBuilder = bind(mockField.getType());

@@ -10,9 +10,9 @@ import com.google.inject.Module;
 
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
+@Target({ ElementType.TYPE, ElementType.METHOD })
 public @interface GuiceModules {
 
-    Class<? extends Module>[] modules() default {};
+    Class<? extends Module>[] value() default {};
 
 }
