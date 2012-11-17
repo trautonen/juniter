@@ -1,9 +1,12 @@
 package org.eluder.juniter.core.runner;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import org.eluder.juniter.core.TestLifeCycle;
+import org.eluder.juniter.core.TestLifeCycles;
 import org.eluder.juniter.core.invoker.AfterLifeCycleInvoker;
 import org.eluder.juniter.core.invoker.BeforeLifeCycleInvoker;
 import org.eluder.juniter.core.invoker.LifeCycleHoldingMethod;
@@ -19,20 +22,26 @@ import com.google.common.collect.Lists;
 
 public class TestLifeCycleBlockRunner extends BlockJUnit4ClassRunner {
 
-    private final List<Class<? extends TestLifeCycle>> testLifeCycles;
-
-    public TestLifeCycleBlockRunner(final Class<?> klass, final List<Class<? extends TestLifeCycle>> testLifeCycles) throws InitializationError {
+    public TestLifeCycleBlockRunner(final Class<?> klass) throws InitializationError {
         super(klass);
-        this.testLifeCycles = testLifeCycles;
     }
 
-    protected List<Class<? extends TestLifeCycle>> getTestLifeCycles() {
+    protected List<Class<? extends TestLifeCycle>> getTestLifeCycles(final FrameworkMethod method) {
+        List<Class<? extends TestLifeCycle>> testLifeCycles = new ArrayList<Class<? extends TestLifeCycle>>();
+        TestLifeCycles methodAnnotation = method.getAnnotation(TestLifeCycles.class);
+        if (methodAnnotation != null) {
+            testLifeCycles.addAll(Arrays.asList(methodAnnotation.value()));
+        }
+        List<TestLifeCycles> classAnnotations = ReflectionUtils.getAnnotationsRecursive(method.getMethod().getDeclaringClass(), TestLifeCycles.class);
+        for (TestLifeCycles classAnnotation : classAnnotations) {
+            testLifeCycles.addAll(Arrays.asList(classAnnotation.value()));
+        }
         return testLifeCycles;
     }
 
     @Override
     protected final Statement methodBlock(final FrameworkMethod method) {
-        List<TestLifeCycle> testLifeCycles = initTestLifeCycles(getTestLifeCycles());
+        List<TestLifeCycle> testLifeCycles = initTestLifeCycles(getTestLifeCycles(method));
         LifeCycleHoldingMethod lifeCycleHoldingMethod = new LifeCycleHoldingMethod(method, testLifeCycles);
         Statement statement = super.methodBlock(lifeCycleHoldingMethod);
         return methodBlock(lifeCycleHoldingMethod, statement);

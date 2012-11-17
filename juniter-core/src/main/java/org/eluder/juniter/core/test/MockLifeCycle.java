@@ -3,6 +3,7 @@ package org.eluder.juniter.core.test;
 import java.util.List;
 
 import org.eluder.juniter.core.Mock;
+import org.eluder.juniter.core.TestLifeCycleException;
 import org.eluder.juniter.core.mock.DefaultMocker;
 import org.eluder.juniter.core.mock.Mocker;
 import org.eluder.juniter.core.util.ReflectionUtils;
@@ -21,7 +22,7 @@ public class MockLifeCycle extends BaseLifeCycle {
     public MockLifeCycle() {
         this.mocker = createMocker();
         if (this.mocker == null) {
-            throw new IllegalStateException("Mocker not created properly");
+            throw new TestLifeCycleException("Mocker not created properly");
         } else {
             log.debug("{} set as mocker", this.mocker.getClass().getName());
         }

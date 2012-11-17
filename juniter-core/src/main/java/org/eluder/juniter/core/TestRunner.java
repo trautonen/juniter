@@ -26,13 +26,7 @@ public class TestRunner extends org.junit.runner.Runner implements Filterable {
         } else {
             log.debug("Test runner initialized with {}", runner.getClass().getName());
         }
-        Class<? extends TestLifeCycle>[] lifeCycles = getLifeCycles(context);
-        if (lifeCycles == null) {
-            throw new InitializationError("Test life cycles cannot be null");
-        } else if (lifeCycles.length > 0) {
-            log.debug("Test runner using life cycles of {}", (Object) lifeCycles);
-        }
-        runner.init(klass, getLifeCycles(context));
+        runner.init(klass);
     }
 
     @Override
@@ -54,20 +48,7 @@ public class TestRunner extends org.junit.runner.Runner implements Filterable {
         if (context == null) {
             return new BasicRunner();
         } else {
-            try {
-                return ReflectionUtils.instantiate(context.runner());
-            } catch (IllegalStateException ex) {
-                throw new InitializationError(ex);
-            }
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    protected Class<? extends TestLifeCycle>[] getLifeCycles(final TestContext context) {
-        if (context == null) {
-            return new Class[0];
-        } else {
-            return context.lifeCycles();
+            return ReflectionUtils.instantiate(context.runner());
         }
     }
 }

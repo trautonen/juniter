@@ -1,9 +1,5 @@
 package org.eluder.juniter.core.runner;
 
-import java.util.Arrays;
-import java.util.List;
-
-import org.eluder.juniter.core.TestLifeCycle;
 import org.junit.runner.Description;
 import org.junit.runner.manipulation.Filter;
 import org.junit.runner.manipulation.NoTestsRemainException;
@@ -19,8 +15,8 @@ public class BasicRunner implements Runner {
     private TestLifeCycleBlockRunner delegate;
 
     @Override
-    public final void init(final Class<?> testClass, final Class<? extends TestLifeCycle>... testLifeCycles) throws InitializationError {
-        delegate = createDelegate(testClass, Arrays.asList(testLifeCycles));
+    public final void init(final Class<?> testClass) throws InitializationError {
+        delegate = createDelegate(testClass);
         if (delegate == null) {
             throw new InitializationError("JUnit block runner delegate not created properly");
         } else {
@@ -43,7 +39,7 @@ public class BasicRunner implements Runner {
         delegate.filter(filter);
     }
 
-    protected TestLifeCycleBlockRunner createDelegate(final Class<?> testClass, final List<Class<? extends TestLifeCycle>> testLifeCycles) throws InitializationError {
-        return new TestLifeCycleBlockRunner(testClass, testLifeCycles);
+    protected TestLifeCycleBlockRunner createDelegate(final Class<?> testClass) throws InitializationError {
+        return new TestLifeCycleBlockRunner(testClass);
     }
 }

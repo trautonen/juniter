@@ -13,7 +13,7 @@ import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.TestClass;
 
 @RunWith(TestRunner.class)
-@TestContext(lifeCycles = { FirstLifeCycle.class, SecondLifeCycle.class })
+@TestLifeCycles({ FirstLifeCycle.class, SecondLifeCycle.class })
 public class TestRunnerTest {
 
     private boolean startFirst = false;

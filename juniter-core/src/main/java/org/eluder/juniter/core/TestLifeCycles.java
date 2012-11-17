@@ -6,14 +6,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.eluder.juniter.core.runner.BasicRunner;
-import org.eluder.juniter.core.runner.Runner;
-
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-public @interface TestContext {
+@Target({ ElementType.TYPE, ElementType.METHOD })
+public @interface TestLifeCycles {
 
-    Class<? extends Runner> runner() default BasicRunner.class;
+    Class<? extends TestLifeCycle>[] value() default {};
 
 }
