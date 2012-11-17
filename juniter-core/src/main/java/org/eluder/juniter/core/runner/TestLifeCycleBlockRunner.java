@@ -65,6 +65,26 @@ public class TestLifeCycleBlockRunner extends BlockJUnit4ClassRunner {
     }
 
     @Override
+    protected final Statement possiblyExpectingExceptions(final FrameworkMethod method, final Object test, final Statement next) {
+        return possiblyExpectingExceptions((LifeCycleHoldingMethod) method, test, next);
+    }
+
+    @SuppressWarnings("deprecation")
+    protected Statement possiblyExpectingExceptions(final LifeCycleHoldingMethod method, final Object target, final Statement statement) {
+        return super.possiblyExpectingExceptions(method, target, statement);
+    }
+
+    @Override
+    protected final Statement withPotentialTimeout(final FrameworkMethod method, final Object test, final Statement next) {
+        return withPotentialTimeout((LifeCycleHoldingMethod) method, test, next);
+    }
+
+    @SuppressWarnings("deprecation")
+    protected Statement withPotentialTimeout(final LifeCycleHoldingMethod method, final Object target, final Statement statement) {
+        return super.withPotentialTimeout(method, target, statement);
+    }
+
+    @Override
     protected final Statement withBefores(final FrameworkMethod method, final Object target, final Statement statement) {
         return withBefores((LifeCycleHoldingMethod) method, target, statement);
     }

@@ -43,17 +43,17 @@ public class GuiceLifeCycle extends BaseLifeCycle {
     }
 
     private List<Class<? extends Module>> getGuiceModules(final TestClass testClass, final FrameworkMethod method) {
-        List<Class<? extends Module>> moduleTypes = new ArrayList<Class<? extends Module>>();
+        List<Class<? extends Module>> guiceModules = new ArrayList<Class<? extends Module>>();
         GuiceModules methodAnnotation = method.getAnnotation(GuiceModules.class);
         if (methodAnnotation != null) {
-            moduleTypes.addAll(Arrays.asList(methodAnnotation.value()));
+            guiceModules.addAll(Arrays.asList(methodAnnotation.value()));
         }
         List<GuiceModules> classAnnotations = ReflectionUtils.getAnnotationsRecursive(testClass.getJavaClass(), GuiceModules.class);
         for (GuiceModules classAnnotation : classAnnotations) {
-            moduleTypes.addAll(Arrays.asList(classAnnotation.value()));
+            guiceModules.addAll(Arrays.asList(classAnnotation.value()));
         }
-        moduleTypes.addAll(ReflectionUtils.getDeclaredClassesRecursive(testClass.getJavaClass(), Module.class, true));
-        return moduleTypes;
+        guiceModules.addAll(ReflectionUtils.getDeclaredClassesRecursive(testClass.getJavaClass(), Module.class, true));
+        return guiceModules;
     }
 
     private GuiceContext getGuiceContext(final TestClass testClass, final FrameworkMethod method) {
