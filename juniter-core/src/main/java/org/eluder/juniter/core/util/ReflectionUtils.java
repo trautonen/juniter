@@ -2,7 +2,6 @@ package org.eluder.juniter.core.util;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,18 +55,32 @@ public class ReflectionUtils {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> List<Class<T>> getDeclaredClassesRecursive(final Class<?> type, final Class<T> ofType, final boolean noAbstract) {
+    public static <T> List<Class<T>> getDeclaredClassesRecursive(final Class<?> type, final Class<T> ofType) {
         List<Class<T>> declaredClasses = new ArrayList<Class<T>>();
         Class<?> current = type;
         while (!Object.class.equals(current)) {
             for (Class<?> declaredClass : current.getDeclaredClasses()) {
-                if ((!noAbstract || !Modifier.isAbstract(declaredClass.getModifiers())) && (ofType == null || ofType.isAssignableFrom(declaredClass))) {
+                if (ofType == null || ofType.isAssignableFrom(declaredClass)) {
                     declaredClasses.add((Class<T>) declaredClass);
                 }
             }
             current = current.getSuperclass();
         }
         return declaredClasses;
+    }
+
+    public static List<Field> getDeclaredFieldsRecursive(final Class<?> type, final Class<?> ofType) {
+        List<Field> declaredFields = new ArrayList<Field>();
+        Class<?> current = type;
+        while (!Object.class.equals(current)) {
+            for (Field field : current.getDeclaredFields()) {
+                if (ofType == null || ofType.isAssignableFrom(field.getType())) {
+                    declaredFields.add(field);
+                }
+            }
+            current = current.getSuperclass();
+        }
+        return declaredFields;
     }
 
     private static Object doAsAccessible(final Field field, final AsAccessible asAccessible) {

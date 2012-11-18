@@ -8,10 +8,9 @@ import java.lang.annotation.Target;
 
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.TYPE, ElementType.METHOD })
-public @interface GuiceContext {
+@Target(ElementType.FIELD)
+public @interface ImplementedBy {
 
-    boolean bindMocks() default true;
+    Class<?> value ();
 
-    boolean autoContext() default true;
 }

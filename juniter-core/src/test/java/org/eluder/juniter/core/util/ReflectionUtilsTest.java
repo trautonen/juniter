@@ -1,5 +1,6 @@
 package org.eluder.juniter.core.util;
 
+import java.lang.reflect.Field;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlRootElement;
@@ -44,12 +45,18 @@ public class ReflectionUtilsTest {
 
     @Test
     public void testGetDeclaredClassesRecursive() {
-        List<Class<Object>> declaredClassesAll = ReflectionUtils.getDeclaredClassesRecursive(ReflectionTestClass.class, null, false);
+        List<Class<Object>> declaredClassesAll = ReflectionUtils.getDeclaredClassesRecursive(ReflectionTestClass.class, null);
         Assert.assertEquals(3, declaredClassesAll.size());
-        List<Class<ReflectionTestClass>> declaredClassesOfType = ReflectionUtils.getDeclaredClassesRecursive(ReflectionTestClass.class, ReflectionTestClass.class, false);
+        List<Class<ReflectionTestClass>> declaredClassesOfType = ReflectionUtils.getDeclaredClassesRecursive(ReflectionTestClass.class, ReflectionTestClass.class);
         Assert.assertEquals(2, declaredClassesOfType.size());
-        List<Class<ReflectionTestClass>> declaredClassesNoAbstract = ReflectionUtils.getDeclaredClassesRecursive(ReflectionTestClass.class, ReflectionTestClass.class, true);
-        Assert.assertEquals(1, declaredClassesNoAbstract.size());
+    }
+
+    @Test
+    public void testGetDeclaredFieldsRecursive() {
+        List<Field> declaredFieldsAll = ReflectionUtils.getDeclaredFieldsRecursive(ReflectionTestClass.class, null);
+        Assert.assertEquals(3, declaredFieldsAll.size());
+        List<Field> declaredFieldsOfType = ReflectionUtils.getDeclaredFieldsRecursive(ReflectionTestClass.class, String.class);
+        Assert.assertEquals(2, declaredFieldsOfType.size());
     }
 
     @XmlRootElement(name = "inherited")
@@ -72,6 +79,9 @@ public class ReflectionUtilsTest {
 
     @XmlRootElement(name = "super")
     public static class ReflectionSuperClass {
+
+        @SuppressWarnings("unused")
+        private Long longField;
 
         @SuppressWarnings("unused")
         private static abstract class Test3 extends ReflectionTestClass { }

@@ -1,27 +1,24 @@
 package org.eluder.juniter.guice.test;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.eluder.juniter.core.Mock;
 import org.eluder.juniter.core.TestLifeCycleException;
 import org.eluder.juniter.core.test.BaseLifeCycle;
 import org.eluder.juniter.core.util.ReflectionUtils;
 import org.eluder.juniter.guice.GuiceContext;
 import org.eluder.juniter.guice.GuiceModules;
-import org.junit.runners.model.FrameworkField;
+import org.eluder.juniter.guice.module.AutoContextModule;
+import org.eluder.juniter.guice.module.MockModule;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.TestClass;
 
-import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
-import com.google.inject.binder.AnnotatedBindingBuilder;
-import com.google.inject.name.Names;
 
 public class GuiceLifeCycle extends BaseLifeCycle {
 
@@ -29,9 +26,13 @@ public class GuiceLifeCycle extends BaseLifeCycle {
     public void onBefore(final TestClass testClass, final FrameworkMethod method, final Object target) {
         List<Module> modules = new ArrayList<Module>();
         GuiceContext guiceContext = getGuiceContext(testClass, method);
-        verifyGuiceContext(guiceContext);
         if (guiceContext == null || guiceContext.bindMocks()) {
-            modules.add(new MockModule(testClass.getAnnotatedFields(Mock.class), target));
+            modules.add(createMockModule(testClass, method, target));
+        }
+        AutoContextModule autoContextModule = null;
+        if (guiceContext == null || guiceContext.autoContext()) {
+            autoContextModule = createAutoContextModule(testClass, method, target);
+            modules.add(autoContextModule);
         }
         List<Class<? extends Module>> guiceModules = getGuiceModules(testClass, method);
         verifyGuiceModules(guiceModules);
@@ -40,6 +41,17 @@ public class GuiceLifeCycle extends BaseLifeCycle {
         }
         Injector injector = Guice.createInjector(modules);
         injector.injectMembers(target);
+        if (autoContextModule != null) {
+            autoContextModule.injectFields(injector);
+        }
+    }
+
+    protected MockModule createMockModule(final TestClass testClass, final FrameworkMethod method, final Object target) {
+        return new MockModule(testClass, target);
+    }
+
+    protected AutoContextModule createAutoContextModule(final TestClass testClass, final FrameworkMethod method, final Object target) {
+        return new AutoContextModule(testClass, target);
     }
 
     private List<Class<? extends Module>> getGuiceModules(final TestClass testClass, final FrameworkMethod method) {
@@ -52,7 +64,11 @@ public class GuiceLifeCycle extends BaseLifeCycle {
         for (GuiceModules classAnnotation : classAnnotations) {
             guiceModules.addAll(Arrays.asList(classAnnotation.value()));
         }
-        guiceModules.addAll(ReflectionUtils.getDeclaredClassesRecursive(testClass.getJavaClass(), Module.class, true));
+        for (Class<Module> declaredModule : ReflectionUtils.getDeclaredClassesRecursive(testClass.getJavaClass(), Module.class)) {
+            if (!Modifier.isAbstract(declaredModule.getModifiers()) && !Modifier.isInterface(declaredModule.getModifiers())) {
+                guiceModules.add(declaredModule);
+            }
+        }
         return guiceModules;
     }
 
@@ -66,10 +82,6 @@ public class GuiceLifeCycle extends BaseLifeCycle {
             return classAnnotations.get(0);
         }
         return null;
-    }
-
-    private void verifyGuiceContext(final GuiceContext guiceContext) {
-
     }
 
     private void verifyGuiceModules(final List<Class<? extends Module>> guiceModules) {
@@ -88,47 +100,6 @@ public class GuiceLifeCycle extends BaseLifeCycle {
             if (!zeroArg) {
                 throw new TestLifeCycleException(guiceModule.getName() + " does not have a zero arg constructor");
             }
-        }
-    }
-
-    private static class MockModule extends AbstractModule {
-
-        private final List<FrameworkField> mockFields;
-        private final Object target;
-
-        public MockModule(final List<FrameworkField> mockFields, final Object target) {
-            this.mockFields = mockFields;
-            this.target = target;
-        }
-
-        @SuppressWarnings({ "unchecked", "rawtypes" })
-        @Override
-        protected void configure() {
-            for (FrameworkField mockField : mockFields) {
-                Object value = ReflectionUtils.getFieldValue(mockField.getField(), target);
-                if (value == null) {
-                    throw new TestLifeCycleException("Mock field " + mockField.getName() + " not initialized, is mock test life cycle run before Guice test life cycle?");
-                } else {
-                    String name = getName(mockField.getField());
-                    AnnotatedBindingBuilder bindingBuilder = bind(mockField.getType());
-                    if (name != null) {
-                        bindingBuilder.annotatedWith(Names.named(name));
-                    }
-                    bindingBuilder.toInstance(value);
-                }
-            }
-        }
-
-        private String getName(final Field field) {
-            com.google.inject.name.Named guiceNamed = field.getAnnotation(com.google.inject.name.Named.class);
-            if (guiceNamed != null) {
-                return guiceNamed.value();
-            }
-            javax.inject.Named cdiNamed = field.getAnnotation(javax.inject.Named.class);
-            if (cdiNamed != null) {
-                return cdiNamed.value();
-            }
-            return null;
         }
     }
 }
