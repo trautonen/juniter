@@ -10,6 +10,26 @@
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
+    <name>juniter</name>
+    <description>Framework that provides additional features to JUnit</description>
+    <url>https://github.com/trautonen/juniter</url>
+    <inceptionYear>2012</inceptionYear>
+    <organization>
+        <name>Tapio Rautonen</name>
+    </organization>
+
+    <developers>
+        <developer>
+            <name>Tapio Rautonen</name>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:git://github.com/trautonen/juniter.git</connection>
+        <developerConnection>scm:git:git://github.com/trautonen/juniter.git</developerConnection>
+        <url>https://github.com/trautonen/juniter</url>
+    </scm>
+
 	<modules>
 		<module>juniter-core</module>
 		<module>juniter-guice</module>
