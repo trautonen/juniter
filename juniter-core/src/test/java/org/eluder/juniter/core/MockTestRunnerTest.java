@@ -2,11 +2,8 @@ package org.eluder.juniter.core;
 
 import java.util.List;
 
-import junit.framework.Assert;
-
-import org.eluder.juniter.core.Mock;
-import org.eluder.juniter.core.MockTestRunner;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

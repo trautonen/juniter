@@ -3,9 +3,8 @@ package org.eluder.juniter.guice;
 import java.io.InputStream;
 import java.nio.channels.Channel;
 
-import junit.framework.Assert;
-
 import org.eluder.juniter.core.Mock;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

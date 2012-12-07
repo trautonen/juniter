@@ -1,11 +1,10 @@
 package org.eluder.juniter.core;
 
-import junit.framework.Assert;
-
 import org.eluder.juniter.core.TestRunnerTest.FirstLifeCycle;
 import org.eluder.juniter.core.TestRunnerTest.SecondLifeCycle;
 import org.eluder.juniter.core.test.BaseLifeCycle;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
