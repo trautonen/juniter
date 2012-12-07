@@ -14,11 +14,11 @@ access to the test instance.
 Comparison between the TestLifeCycle and TestRule interfaces:
 
 <table>
-  <th>
+  <tr>
     <td></td>
-    <td>TestLifeCycle</td>
-    <td>TestRule</td>
-  </th>
+    <td><strong>TestLifeCycle</strong></td>
+    <td><strong>TestRule</strong></td>
+  </tr>
   <tr>
     <td>Easy access to test instance</td>
     <td>yes</td>
