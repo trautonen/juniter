@@ -19,7 +19,7 @@ public class BeforeLifeCycleInvoker extends AbstractLifeCycleInvoker {
     @Override
     public void evaluate() throws Throwable {
         for (TestLifeCycle testLifeCycle : testLifeCycles) {
-            testLifeCycle.onBefore(getTestClass(), getMethod(), getTarget());
+            testLifeCycle.onBeforeBefore(getTestClass(), getMethod(), getTarget());
         }
         getBase().evaluate();
     }

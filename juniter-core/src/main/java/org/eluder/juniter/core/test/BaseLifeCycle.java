@@ -7,7 +7,7 @@ import org.junit.runners.model.TestClass;
 public class BaseLifeCycle implements TestLifeCycle {
 
     @Override
-    public void onBefore(final TestClass testClass, final FrameworkMethod method, final Object target) {
+    public void onBeforeBefore(final TestClass testClass, final FrameworkMethod method, final Object target) {
         // noop
     }
 
@@ -32,7 +32,7 @@ public class BaseLifeCycle implements TestLifeCycle {
     }
 
     @Override
-    public void onAfter(final TestClass testClass, final FrameworkMethod method, final Object target) {
+    public void onAfterAfter(final TestClass testClass, final FrameworkMethod method, final Object target) {
         // noop
     }
 }

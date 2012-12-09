@@ -30,7 +30,7 @@ public class AfterLifeCycleInvoker extends AbstractLifeCycleInvoker {
         } finally {
             for (TestLifeCycle testLifeCycle : Lists.reverse(testLifeCycles)) {
                 try {
-                    testLifeCycle.onAfter(getTestClass(), getMethod(), getTarget());
+                    testLifeCycle.onAfterAfter(getTestClass(), getMethod(), getTarget());
                 } catch (Throwable th) {
                     errors.add(th);
                 }

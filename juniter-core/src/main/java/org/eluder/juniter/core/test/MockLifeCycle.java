@@ -33,7 +33,7 @@ public class MockLifeCycle extends BaseLifeCycle {
     }
 
     @Override
-    public void onBefore(final TestClass testClass, final FrameworkMethod method, final Object target) {
+    public void onBeforeBefore(final TestClass testClass, final FrameworkMethod method, final Object target) {
         List<FrameworkField> mockFields = testClass.getAnnotatedFields(Mock.class);
         for (FrameworkField mockField : mockFields) {
             Object mock = mocker.mock(mockField.getType());

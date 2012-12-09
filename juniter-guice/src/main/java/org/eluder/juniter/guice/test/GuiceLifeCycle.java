@@ -23,7 +23,7 @@ import com.google.inject.Module;
 public class GuiceLifeCycle extends BaseLifeCycle {
 
     @Override
-    public void onBefore(final TestClass testClass, final FrameworkMethod method, final Object target) {
+    public void onBeforeBefore(final TestClass testClass, final FrameworkMethod method, final Object target) {
         List<Module> modules = new ArrayList<Module>();
         GuiceContext guiceContext = getGuiceContext(testClass, method);
         if (guiceContext == null || guiceContext.bindMocks()) {

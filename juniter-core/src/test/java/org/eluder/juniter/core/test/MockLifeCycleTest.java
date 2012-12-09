@@ -22,7 +22,7 @@ public class MockLifeCycleTest {
 
     @Test
     public void testBefore() {
-        new MockLifeCycle().onBefore(new TestClass(getClass()), null, this);
+        new MockLifeCycle().onBeforeBefore(new TestClass(getClass()), null, this);
         Assert.assertNotNull(inputStreamMock);
         Assert.assertNotNull(publicList);
         Assert.assertNull(iterable);

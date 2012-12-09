@@ -107,7 +107,7 @@ public class TestRunnerTest {
 
     public static abstract class AbstractLifeCycle extends BaseLifeCycle {
         @Override
-        public void onBefore(final TestClass testClass, final FrameworkMethod method, final Object target) {
+        public void onBeforeBefore(final TestClass testClass, final FrameworkMethod method, final Object target) {
             assertBasic(testClass, method, target);
             beforeInternal((TestRunnerTest) target);
         }
@@ -131,7 +131,7 @@ public class TestRunnerTest {
         protected abstract void afterTestInternal(TestRunnerTest test);
 
         @Override
-        public void onAfter(final TestClass testClass, final FrameworkMethod method, final Object target) {
+        public void onAfterAfter(final TestClass testClass, final FrameworkMethod method, final Object target) {
             assertBasic(testClass, method, target);
             afterInternal((TestRunnerTest) target);
         }
