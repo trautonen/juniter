@@ -7,12 +7,14 @@ import org.junit.runner.Description;
 import org.junit.runner.manipulation.Filter;
 import org.junit.runner.manipulation.Filterable;
 import org.junit.runner.manipulation.NoTestsRemainException;
+import org.junit.runner.manipulation.Sortable;
+import org.junit.runner.manipulation.Sorter;
 import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.model.InitializationError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class TestRunner extends org.junit.runner.Runner implements Filterable {
+public class TestRunner extends org.junit.runner.Runner implements Filterable, Sortable {
 
     private static final Logger log = LoggerFactory.getLogger(TestRunner.class);
 
@@ -42,6 +44,11 @@ public class TestRunner extends org.junit.runner.Runner implements Filterable {
     @Override
     public final void filter(final Filter filter) throws NoTestsRemainException {
         runner.filter(filter);
+    }
+
+    @Override
+    public void sort(final Sorter sorter) {
+        runner.sort(sorter);
     }
 
     protected Runner createRunner(final TestContext context) throws InitializationError {
