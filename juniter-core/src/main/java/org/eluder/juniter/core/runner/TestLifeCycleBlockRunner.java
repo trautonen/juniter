@@ -20,12 +20,25 @@ import org.junit.runners.model.Statement;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 
+/**
+ * The real test runner that binds juniter {@link TestLifeCycle}s to JUnit tests. Uses
+ * {@link LifeCycleHoldingMethod} to wrap the framework method and provide a context for test
+ * life cycles. All convenient hooks are provided with {@link LifeCycleHoldingMethod} so that
+ * extending the juniter framework is as easy as possible.
+ */
 public class TestLifeCycleBlockRunner extends BlockJUnit4ClassRunner {
 
     public TestLifeCycleBlockRunner(final Class<?> klass) throws InitializationError {
         super(klass);
     }
 
+    /**
+     * Returns the test life cycles. Test life cycles are collected starting from the test method
+     * and then the method defining class and after that all super classes of the test class.
+     * Subclasses can change the order of test life cycles or edit the default list.
+     *
+     * @param method the test method
+     */
     protected List<Class<? extends TestLifeCycle>> getTestLifeCycles(final FrameworkMethod method) {
         List<Class<? extends TestLifeCycle>> testLifeCycles = new ArrayList<Class<? extends TestLifeCycle>>();
         TestLifeCycles methodAnnotation = method.getAnnotation(TestLifeCycles.class);

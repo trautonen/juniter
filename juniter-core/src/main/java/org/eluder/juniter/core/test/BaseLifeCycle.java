@@ -4,6 +4,10 @@ import org.eluder.juniter.core.TestLifeCycle;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.TestClass;
 
+/**
+ * Simple base class for test life cycles. Provides convinient empty methods so that only those
+ * that are relevant to the implementation can be implemented.
+ */
 public class BaseLifeCycle implements TestLifeCycle {
 
     @Override

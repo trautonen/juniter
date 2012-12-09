@@ -13,6 +13,10 @@ import org.junit.runners.model.TestClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Test life cycle that mocks all {@link Mock} annotated fields in test class and in its super
+ * classes. Custom mocker can be provided overriding the {@link #createMocker()} method.
+ */
 public class MockLifeCycle extends BaseLifeCycle {
 
     private static final Logger log = LoggerFactory.getLogger(MockLifeCycle.class);
@@ -28,6 +32,9 @@ public class MockLifeCycle extends BaseLifeCycle {
         }
     }
 
+    /**
+     * Creates the mocker.
+     */
     protected Mocker createMocker() {
         return new DefaultMocker();
     }

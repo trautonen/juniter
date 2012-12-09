@@ -5,6 +5,9 @@ import org.junit.runners.model.TestClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Test life cycle that logs the duration of a test.
+ */
 public class TimingLifeCycle extends BaseLifeCycle {
 
     private static final Logger log = LoggerFactory.getLogger(TimingLifeCycle.class);
