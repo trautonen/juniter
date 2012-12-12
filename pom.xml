@@ -5,30 +5,36 @@
 		<artifactId>eluder-parent</artifactId>
 		<version>1-SNAPSHOT</version>
 	</parent>
+
 	<groupId>org.eluder.juniter</groupId>
 	<artifactId>juniter</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
-    <name>juniter</name>
-    <description>Framework that provides additional features to JUnit</description>
-    <url>https://github.com/trautonen/juniter</url>
-    <inceptionYear>2012</inceptionYear>
-    <organization>
-        <name>Tapio Rautonen</name>
-    </organization>
+	<name>juniter</name>
+	<description>Framework that provides additional features to JUnit</description>
+	<url>https://github.com/trautonen/juniter</url>
+	<inceptionYear>2012</inceptionYear>
 
-    <developers>
-        <developer>
-            <name>Tapio Rautonen</name>
-        </developer>
-    </developers>
+	<developers>
+		<developer>
+			<name>Tapio Rautonen</name>
+		</developer>
+	</developers>
 
-    <scm>
-        <connection>scm:git:git://github.com/trautonen/juniter.git</connection>
-        <developerConnection>scm:git:git://github.com/trautonen/juniter.git</developerConnection>
-        <url>https://github.com/trautonen/juniter</url>
-    </scm>
+	<licenses>
+		<license>
+			<name>The MIT License (MIT)</name>
+			<url>http://opensource.org/licenses/MIT</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+	<scm>
+		<connection>scm:git:git://github.com/trautonen/juniter.git</connection>
+		<developerConnection>scm:git:git://github.com/trautonen/juniter.git</developerConnection>
+		<url>https://github.com/trautonen/juniter</url>
+	</scm>
 
 	<modules>
 		<module>juniter-core</module>
