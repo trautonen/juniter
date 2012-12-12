@@ -6,11 +6,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.eluder.juniter.core.Mock;
 import org.eluder.juniter.core.TestLifeCycleException;
 import org.eluder.juniter.core.test.BaseLifeCycle;
 import org.eluder.juniter.core.util.ReflectionUtils;
 import org.eluder.juniter.guice.GuiceContext;
 import org.eluder.juniter.guice.GuiceModules;
+import org.eluder.juniter.guice.ImplementedBy;
 import org.eluder.juniter.guice.module.AutoContextModule;
 import org.eluder.juniter.guice.module.MockModule;
 import org.junit.runners.model.FrameworkMethod;
@@ -20,6 +22,16 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 
+/**
+ * Test life cycle that provides Guice injector context generation. Supports
+ * different strategies to define the context.
+ * <ul>
+ * <li>Automatic bind of mocks that are annotated with {@link Mock}</li>
+ * <li>Automatic bind of concrete types or abstract types or interfaces annotated with {@link ImplementedBy}</li>
+ * <li>Guice modules provided by {@link GuiceModules} annotation on test method or test class level</li>
+ * <li>Guice modules declared as inner classes in test class</li>
+ * </ul>
+ */
 public class GuiceLifeCycle extends BaseLifeCycle {
 
     @Override
