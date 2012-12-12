@@ -26,7 +26,7 @@ public class LifeCycleHoldingMethod extends FrameworkMethod {
     /**
      * Returns the test life cycles.
      */
-    public List<TestLifeCycle> getTestLifeCycles() {
+    public final List<TestLifeCycle> getTestLifeCycles() {
         return testLifeCycles;
     }
 

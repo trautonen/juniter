@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.ListIterator;
 
 import org.eluder.juniter.core.TestLifeCycle;
 import org.eluder.juniter.core.TestLifeCycles;
@@ -16,9 +17,6 @@ import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.Statement;
-
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
 
 /**
  * The real test runner that binds juniter {@link TestLifeCycle}s to JUnit tests. Uses
@@ -71,7 +69,9 @@ public class TestLifeCycleBlockRunner extends BlockJUnit4ClassRunner {
 
     protected Statement methodInvoker(final LifeCycleHoldingMethod method, final Object test) {
         Statement invoker = super.methodInvoker(method, test);
-        for (TestLifeCycle lifeCycle : Lists.reverse(method.getTestLifeCycles())) {
+        ListIterator<TestLifeCycle> iter = method.getTestLifeCycles().listIterator(method.getTestLifeCycles().size());
+        while (iter.hasPrevious()) {
+            TestLifeCycle lifeCycle = iter.previous();
             invoker = new TestLifeCycleInvoker(invoker, getTestClass(), method, test, lifeCycle);
         }
         return invoker;
@@ -123,12 +123,11 @@ public class TestLifeCycleBlockRunner extends BlockJUnit4ClassRunner {
         if (testLifeCycles == null || testLifeCycles.isEmpty()) {
             return Collections.emptyList();
         } else {
-            return Collections.unmodifiableList(Lists.transform(testLifeCycles, new Function<Class<? extends TestLifeCycle>, TestLifeCycle>() {
-                @Override
-                public TestLifeCycle apply(final Class<? extends TestLifeCycle> input) {
-                    return ReflectionUtils.instantiate(input);
-                }
-            }));
+            List<TestLifeCycle> instances = new ArrayList<TestLifeCycle>(testLifeCycles.size());
+            for (Class<? extends TestLifeCycle> testLifeCycle : testLifeCycles) {
+                instances.add(ReflectionUtils.instantiate(testLifeCycle));
+            }
+            return Collections.unmodifiableList(instances);
         }
     }
 }

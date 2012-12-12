@@ -2,14 +2,13 @@ package org.eluder.juniter.core.invoker;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ListIterator;
 
 import org.eluder.juniter.core.TestLifeCycle;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.MultipleFailureException;
 import org.junit.runners.model.Statement;
 import org.junit.runners.model.TestClass;
-
-import com.google.common.collect.Lists;
 
 public class AfterLifeCycleInvoker extends AbstractLifeCycleInvoker {
 
@@ -28,7 +27,9 @@ public class AfterLifeCycleInvoker extends AbstractLifeCycleInvoker {
         } catch (Throwable th) {
             errors.add(th);
         } finally {
-            for (TestLifeCycle testLifeCycle : Lists.reverse(testLifeCycles)) {
+            ListIterator<TestLifeCycle> iter = testLifeCycles.listIterator(testLifeCycles.size());
+            while (iter.hasPrevious()) {
+                TestLifeCycle testLifeCycle = iter.previous();
                 try {
                     testLifeCycle.onAfterAfter(getTestClass(), getMethod(), getTarget());
                 } catch (Throwable th) {
