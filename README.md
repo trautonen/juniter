@@ -56,7 +56,7 @@ Core module requires the following dependency:
 <dependency>
     <groupId>org.eluder.juniter</groupId>
     <artifactId>juniter-core</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.1.0-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -96,7 +96,7 @@ Guice integration requires the following dependency:
 <dependency>
     <groupId>org.eluder.juniter</groupId>
     <artifactId>juniter-guice</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.1.0-SNAPSHOT</version>
 </dependency>
 ```
 
