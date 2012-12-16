@@ -1,7 +1,10 @@
-JUniter
+juniter
 =======
 
-Framework that extends JUnit functionality
+Framework that extends JUnit functionality. Adds alternative approach for test
+rules, automatic mocking, context creation in guice and reflection assert
+utilities. The project juniter uses [semantic versioning](http://semver.org/)
+and tagging to provide clean version numbers.
 
 Test life cycle
 ---------------
@@ -56,7 +59,7 @@ Core module requires the following dependency:
 <dependency>
     <groupId>org.eluder.juniter</groupId>
     <artifactId>juniter-core</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.1.0</version>
 </dependency>
 ```
 
@@ -96,7 +99,7 @@ Guice integration requires the following dependency:
 <dependency>
     <groupId>org.eluder.juniter</groupId>
     <artifactId>juniter-guice</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.1.0</version>
 </dependency>
 ```
 
