@@ -22,6 +22,10 @@ public class JuniterAssert extends Assert {
 
     private static final String ITERABLE_INDICATOR = "[]";
 
+    protected JuniterAssert() {
+        // hide constructor
+    }
+
     /**
      * Asserts that the actual instance is reflectively equal to the expected instance. The types
      * of the instances must be same or sub types of each other. All fields, including private and
@@ -95,7 +99,7 @@ public class JuniterAssert extends Assert {
      * @param excludedFields the excluded field names
      */
     public static void assertReflectionEquals(final Object expected, final Object actual, final boolean assertTransients, final Set<String> excludedFields) {
-        assertReflectionEquals(null, expected, actual, assertTransients, excludedFields);
+        assertReflectionEquals(null, new IdentityRegistry(), expected, actual, assertTransients, excludedFields);
     }
 
     /**
@@ -120,16 +124,16 @@ public class JuniterAssert extends Assert {
         }
     }
 
-    protected static final void assertReflectionEquals(final String fromField, final Object expected, final Object actual, final boolean assertTransients, final Set<String> excludedFields) {
+    protected static final void assertReflectionEquals(final String fromField, final IdentityRegistry identityRegistry, final Object expected, final Object actual, final boolean assertTransients, final Set<String> excludedFields) {
         if (isSameOrBothNull(expected, actual)) {
             return;
         }
-        if (IdentityRegistry.isRegisteredIdentity(expected, actual)) {
+        if (identityRegistry.isRegisteredIdentity(expected, actual)) {
             return;
         }
         assertTypeCompatibility(expected, actual);
         try {
-            IdentityRegistry.registerIdentity(expected, actual);
+            identityRegistry.registerIdentity(expected, actual);
             Class<?> testType = getLeafType(expected, actual);
             if (isIterableType(testType)) {
                 Iterator<?> iterExpected = convertToIterator(expected);
@@ -137,7 +141,7 @@ public class JuniterAssert extends Assert {
                 while (iterExpected.hasNext() && iterActual.hasNext()) {
                     Object expectedItem = iterExpected.next();
                     Object actualItem = iterActual.next();
-                    assertReflectionEquals(fromField + ITERABLE_INDICATOR, expectedItem, actualItem, assertTransients, excludedFields);
+                    assertReflectionEquals(fromField + ITERABLE_INDICATOR, identityRegistry, expectedItem, actualItem, assertTransients, excludedFields);
                 }
                 if (iterExpected.hasNext() || iterActual.hasNext()){
                     Assert.fail("Iterable values from field '" + fromField + "' do not contain same number of items");
@@ -151,12 +155,12 @@ public class JuniterAssert extends Assert {
             } else {
                 for (Field field : ReflectionUtils.getDeclaredFieldsRecursive(testType, null)) {
                     if (isAssertableField(fromField, field, assertTransients, excludedFields)) {
-                        assertReflectionEquals(getFullFieldName(fromField, field), ReflectionUtils.getFieldValue(field, expected), ReflectionUtils.getFieldValue(field, actual), assertTransients, excludedFields);
+                        assertReflectionEquals(getFullFieldName(fromField, field), identityRegistry, ReflectionUtils.getFieldValue(field, expected), ReflectionUtils.getFieldValue(field, actual), assertTransients, excludedFields);
                     }
                 }
             }
         } finally {
-            IdentityRegistry.removeIdentity(expected, actual);
+            identityRegistry.unregisterIdentity(expected, actual);
         }
     }
 
@@ -234,9 +238,5 @@ public class JuniterAssert extends Assert {
             return ((Iterable<?>) instance).iterator();
         }
         return Arrays.asList(asObjectArray(instance)).iterator();
-    }
-
-    protected JuniterAssert() {
-        // hide constructor
     }
 }

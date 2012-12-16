@@ -3,43 +3,39 @@ package org.eluder.juniter.core.util;
 import java.util.HashSet;
 import java.util.Set;
 
-public class IdentityRegistry {
+/**
+ * Identity registry holds identities of pairs. The registry can be used to detect circular
+ * references in reflection assert and avoid eternal loops.
+ */
+public final class IdentityRegistry {
 
-    private static final ThreadLocal<Set<Pair<Identity>>> REGISTRY = new ThreadLocal<Set<Pair<Identity>>>() {
-        @Override
-        protected Set<Pair<Identity>> initialValue() {
-            return new HashSet<Pair<Identity>>();
-        }
-    };
+    private final Set<Pair<Identity>> registry = new HashSet<Pair<Identity>>(32);
 
-    public static boolean isRegisteredIdentity(final Object o1, final Object o2) {
+    public boolean isRegisteredIdentity(final Object o1, final Object o2) {
         Pair<Identity> identity = createIdentity(o1, o2);
         Pair<Identity> switchedIdentity = createSwitchedIdentity(identity);
-        Set<Pair<Identity>> registry = REGISTRY.get();
         return (registry.contains(identity) || registry.contains(switchedIdentity));
     }
 
-    public static void registerIdentity(final Object o1, final Object o2) {
+    public void registerIdentity(final Object o1, final Object o2) {
         Pair<Identity> identity = createIdentity(o1, o2);
         Pair<Identity> switchedIdentity = createSwitchedIdentity(identity);
-        Set<Pair<Identity>> registry = REGISTRY.get();
         registry.add(identity);
         registry.add(switchedIdentity);
     }
 
-    public static void removeIdentity(final Object o1, final Object o2) {
+    public void unregisterIdentity(final Object o1, final Object o2) {
         Pair<Identity> identity = createIdentity(o1, o2);
         Pair<Identity> switchedIdentity = createSwitchedIdentity(identity);
-        Set<Pair<Identity>> registry = REGISTRY.get();
         registry.remove(identity);
         registry.remove(switchedIdentity);
     }
 
-    private static Pair<Identity> createIdentity(final Object o1, final Object o2) {
+    private Pair<Identity> createIdentity(final Object o1, final Object o2) {
         return new Pair<Identity>(new Identity(o1), new Identity(o2));
     }
 
-    private static Pair<Identity> createSwitchedIdentity(final Pair<Identity> original) {
+    private Pair<Identity> createSwitchedIdentity(final Pair<Identity> original) {
         return new Pair<Identity>(original.getRight(), original.getLeft());
     }
 
