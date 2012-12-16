@@ -1,7 +1,10 @@
-JUniter
+juniter
 =======
 
-Framework that extends JUnit functionality
+Framework that extends JUnit functionality. Adds alternative approach for test
+rules, automatic mocking, context creation in guice and reflection assert
+utilities. The project juniter uses [semantic versioning](http://semver.org/)
+and tagging to provide clean version numbers.
 
 Test life cycle
 ---------------
