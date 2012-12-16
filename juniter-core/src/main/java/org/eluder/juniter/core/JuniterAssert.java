@@ -15,24 +15,96 @@ import org.eluder.juniter.core.util.IdentityRegistry;
 import org.eluder.juniter.core.util.ReflectionUtils;
 import org.junit.Assert;
 
+/**
+ * Assertion utility that extends JUnit {@link Assert}.
+ */
 public class JuniterAssert extends Assert {
 
+    private static final String ITERABLE_INDICATOR = "[]";
+
+    /**
+     * Asserts that the actual instance is reflectively equal to the expected instance. The types
+     * of the instances must be same or sub types of each other. All fields, including private and
+     * protected are compared. The assertions checks only basic data types for equality all other
+     * instances in the object graph are asserted against their declared fields. Transient and
+     * static fields are ignored.
+     * <p>
+     * Fields can be ignored by the excluded fields argument. Fields in the object graph follow
+     * naming such as 'fieldInRoot', 'fieldInRoot.fieldInInnerInstance'.
+     *
+     * @param expected the expected instance
+     * @param actual the actual instance
+     * @param excludedFields the excluded field names
+     */
     public static void assertReflectionEquals(final Object expected, final Object actual, final String... excludedFields) {
         assertReflectionEquals(expected, actual, false, excludedFields);
     }
 
+    /**
+     * Asserts that the actual instance is reflectively equal to the expected instance. The types
+     * of the instances must be same or sub types of each other. All fields, including private and
+     * protected are compared. The assertions checks only basic data types for equality all other
+     * instances in the object graph are asserted against their declared fields. Transient fields
+     * are included or ignored according to the assert transients argument. Static fields are
+     * ignored.
+     * <p>
+     * Fields can be ignored by the excluded fields argument. Fields in the object graph follow
+     * naming such as 'fieldInRoot', 'fieldInRoot.fieldInInnerInstance'.
+     *
+     * @param expected the expected instance
+     * @param actual the actual instance
+     * @param assertTransients <code>true</code> for including transient fields, otherwise <code>false</code>
+     * @param excludedFields the excluded field names
+     */
     public static void assertReflectionEquals(final Object expected, final Object actual, final boolean assertTransients, final String... excludedFields) {
         assertReflectionEquals(expected, actual, assertTransients, asSet(excludedFields));
     }
 
+    /**
+     * Asserts that the actual instance is reflectively equal to the expected instance. The types
+     * of the instances must be same or sub types of each other. All fields, including private and
+     * protected are compared. The assertions checks only basic data types for equality all other
+     * instances in the object graph are asserted against their declared fields. Transient and
+     * static fields are ignored.
+     * <p>
+     * Fields can be ignored by the excluded fields argument. Fields in the object graph follow
+     * naming such as 'fieldInRoot', 'fieldInRoot.fieldInInnerInstance'.
+     *
+     * @param expected the expected instance
+     * @param actual the actual instance
+     * @param excludedFields the excluded field names
+     */
     public static void assertReflectionEquals(final Object expected, final Object actual, final Set<String> excludedFields) {
         assertReflectionEquals(expected, actual, false, excludedFields);
     }
 
+    /**
+     * Asserts that the actual instance is reflectively equal to the expected instance. The types
+     * of the instances must be same or sub types of each other. All fields, including private and
+     * protected are compared. The assertions checks only basic data types for equality all other
+     * instances in the object graph are asserted against their declared fields. Transient fields
+     * are included or ignored according to the assert transients argument. Static fields are
+     * ignored.
+     * <p>
+     * Fields can be ignored by the excluded fields argument. Fields in the object graph follow
+     * naming such as 'fieldInRoot', 'fieldInRoot.fieldInInnerInstance'.
+     *
+     * @param expected the expected instance
+     * @param actual the actual instance
+     * @param assertTransients <code>true</code> for including transient fields, otherwise <code>false</code>
+     * @param excludedFields the excluded field names
+     */
     public static void assertReflectionEquals(final Object expected, final Object actual, final boolean assertTransients, final Set<String> excludedFields) {
         assertReflectionEquals(null, expected, actual, assertTransients, excludedFields);
     }
 
+    /**
+     * Asserts that the expected and the actual instance types are related to each other. The
+     * types must be same or sub types of each other.
+     *
+     * @param expected the expected instance
+     * @param actual the actual instance
+     */
     public static void assertTypeCompatibility(final Object expected, final Object actual) {
         if (isSameOrBothNull(expected, actual)) {
             return;
@@ -65,7 +137,7 @@ public class JuniterAssert extends Assert {
                 while (iterExpected.hasNext() && iterActual.hasNext()) {
                     Object expectedItem = iterExpected.next();
                     Object actualItem = iterActual.next();
-                    assertReflectionEquals(fromField + "[]", expectedItem, actualItem, assertTransients, excludedFields);
+                    assertReflectionEquals(fromField + ITERABLE_INDICATOR, expectedItem, actualItem, assertTransients, excludedFields);
                 }
                 if (iterExpected.hasNext() || iterActual.hasNext()){
                     Assert.fail("Iterable values from field '" + fromField + "' do not contain same number of items");
@@ -108,7 +180,7 @@ public class JuniterAssert extends Assert {
 
     protected static final Set<String> asSet(final String... values) {
         if (values == null) {
-            Collections.emptySet();
+            return Collections.emptySet();
         }
         Set<String> set = new HashSet<String>(values.length);
         for (String value : values) {
@@ -131,9 +203,9 @@ public class JuniterAssert extends Assert {
     }
 
     protected static final boolean isAssertableField(final String fromField, final Field field, final boolean assertTransients, final Set<String> excludedFields) {
-        return ((!assertTransients || !Modifier.isTransient(field.getModifiers())) &&
+        return ((assertTransients || !Modifier.isTransient(field.getModifiers())) &&
                 !Modifier.isStatic(field.getModifiers()) &&
-                !excludedFields.contains(getFullFieldName(fromField, field)));
+                !excludedFields.contains(getFullFieldName(fromField, field).replace(ITERABLE_INDICATOR, "") ));
     }
 
     protected static final String getFullFieldName(final String fromField, final Field field) {
@@ -155,10 +227,10 @@ public class JuniterAssert extends Assert {
     }
 
     protected static final Iterator<?> convertToIterator(final Object instance) {
-        if (Iterator.class.isInstance(instance)) {
+        if (instance instanceof Iterator) {
             return (Iterator<?>) instance;
         }
-        if (Iterable.class.isInstance(instance)) {
+        if (instance instanceof Iterable) {
             return ((Iterable<?>) instance).iterator();
         }
         return Arrays.asList(asObjectArray(instance)).iterator();

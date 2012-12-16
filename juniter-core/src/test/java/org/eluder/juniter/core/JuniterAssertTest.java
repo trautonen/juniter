@@ -1,6 +1,7 @@
 package org.eluder.juniter.core;
 
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import org.junit.Test;
@@ -9,6 +10,12 @@ import org.junit.runners.BlockJUnit4ClassRunner;
 
 @RunWith(BlockJUnit4ClassRunner.class)
 public class JuniterAssertTest {
+
+    @Test
+    public void testAssertReflectionEqualsWithSameInstances() {
+        TestClass1 instance1 = new TestClass1();
+        JuniterAssert.assertReflectionEquals(instance1, instance1);
+    }
 
     @Test
     public void testAssertReflectionEqualsWithEqualStrings() {
@@ -31,7 +38,7 @@ public class JuniterAssertTest {
         instance2.another = circular2;
         circular2.circular = instance2;
 
-        JuniterAssert.assertReflectionEquals(instance1, instance2);
+        JuniterAssert.assertReflectionEquals(instance1, instance2, (String[]) null);
     }
 
     @Test
@@ -93,6 +100,50 @@ public class JuniterAssertTest {
     }
 
     @Test
+    public void testAssertReflectionEqualsWithIterator() {
+        TestClass3 instance1 = new TestClass3();
+        TestClass3 instance2 = new TestClass3();
+        instance1.iterator = Arrays.asList("foo", "bar").iterator();
+        instance2.iterator = Arrays.asList("foo", "barbaba").iterator();
+
+        assertWithErrorAndContains(instance1, instance2, "iterator[]", "bar[]", "bar[baba]");
+    }
+
+    @Test
+    public void testAssertReflectionEqualsWithInnerArrayIgnored() {
+        TestClass1 instance1 = new TestClass1();
+        TestClass1 instance2 = new TestClass1();
+        TestClass2 another1 = new TestClass2();
+        TestClass2 another2 = new TestClass2();
+        instance1.another = another1;
+        instance2.another = another2;
+        another1.intsArray = new int[] { 2, 4, 5 };
+        another2.intsArray = new int[] { 2, 3, 5 };
+
+        JuniterAssert.assertReflectionEquals(instance1, instance2, "another.intsArray");
+    }
+
+    @Test
+    public void testAssertReflectionEqualsWithTransientIgnored() {
+        TestClass1 instance1 = new TestClass1();
+        TestClass1 instance2 = new TestClass1();
+        instance1.transientValue = 10;
+        instance2.transientValue = 20;
+
+        JuniterAssert.assertReflectionEquals(instance1, instance2);
+    }
+
+    @Test(expected = AssertionError.class)
+    public void testAssertReflectionEqualsWithTransientAsserted() {
+        TestClass1 instance1 = new TestClass1();
+        TestClass1 instance2 = new TestClass1();
+        instance1.transientValue = 10;
+        instance2.transientValue = 20;
+
+        JuniterAssert.assertReflectionEquals(instance1, instance2, true);
+    }
+
+    @Test
     public void testAssertTypeCompatibilityWithSameTypes() {
         JuniterAssert.assertTypeCompatibility("foo", "bar");
     }
@@ -105,6 +156,21 @@ public class JuniterAssertTest {
     @Test(expected = AssertionError.class)
     public void testAssertTypeCompatibilityWithIncompatibleTypes() {
         JuniterAssert.assertTypeCompatibility(new TestClass1(), new TestClass2());
+    }
+
+    @Test(expected = AssertionError.class)
+    public void testAssertTypeCompatibilityWithExpectedNull() {
+        JuniterAssert.assertTypeCompatibility(null, new TestClass1());
+    }
+
+    @Test(expected = AssertionError.class)
+    public void testAssertTypeCompatibilityWithActualNull() {
+        JuniterAssert.assertTypeCompatibility(new TestClass1(), null);
+    }
+
+    @Test
+    public void testAssertTypeCompatibilityWithNulls() {
+        JuniterAssert.assertTypeCompatibility(null, null);
     }
 
     private void assertWithErrorAndContains(final Object expected, final Object actual, final String... text) {
@@ -123,6 +189,7 @@ public class JuniterAssertTest {
         public TestClass2 another;
         public TestClass3 yetAnother;
         public String value;
+        public transient int transientValue;
     }
 
     @SuppressWarnings("unused")
@@ -134,6 +201,8 @@ public class JuniterAssertTest {
 
     @SuppressWarnings("unused")
     private static class TestClass3 extends TestClass1 {
+        private static final String FOO = "bar";
         public Double number;
+        public Iterator<String> iterator;
     }
 }
