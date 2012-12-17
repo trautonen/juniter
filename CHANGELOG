@@ -1,3 +1,8 @@
+Version 1.1.1
+-------------
+(*) Handle maps correctly in reflection assert
+
+
 Version 1.1.0
 -------------
 (+) JuniterAssert for reflection assertions.
