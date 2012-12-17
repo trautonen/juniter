@@ -25,9 +25,9 @@ do
 done
 
 echo "Setting version to $version in all poms"
-mvn versions:set -DnewVersion=$version
-mvn versions:commit
+mvn versions:set -DnewVersion=$version > /dev/null
+mvn versions:commit > /dev/null
 
 echo "Replacing version numbers in readme"
-sed -i.bak 's,<version>[^<]*</version>,<version>$version</version>,g' $working_dir/README.md
+sed -i.bak "s,<version>[^<]*</version>,<version>$version</version>,g" $working_dir/README.md
 rm $working_dir/README.md.bak
