@@ -12,10 +12,10 @@ package org.eluder.juniter.core;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -27,8 +27,10 @@ package org.eluder.juniter.core;
  */
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -113,6 +115,55 @@ public class JuniterAssertTest {
         instance2.ints = Arrays.asList(1, 3);
 
         assertWithErrorAndContains(instance1, instance2, "ints[]", "<2>", "<3>");
+    }
+
+    @Test
+    public void testAssertReflectionEqualsWithMap() {
+        TestClass2 instance1 = new TestClass2();
+        TestClass2 instance2 = new TestClass2();
+        instance1.map = new HashMap<String, Integer>(5);
+        instance2.map = new HashMap<String, Integer>(4);
+        instance1.map.put("a", 1);
+        instance2.map.put("a", 1);
+
+        JuniterAssert.assertReflectionEquals(instance1, instance2);
+    }
+
+    @Test
+    public void testAssertReflectionEqualsWithDifferentSizesMap() {
+        TestClass2 instance1 = new TestClass2();
+        TestClass2 instance2 = new TestClass2();
+        instance1.map = new HashMap<String, Integer>(5);
+        instance2.map = new HashMap<String, Integer>(4);
+        instance1.map.put("a", 1);
+        instance2.map.put("a", 1);
+        instance2.map.put("b", 2);
+
+        assertWithErrorAndContains(instance1, instance2, "map", "same number of entries");
+    }
+
+    @Test
+    public void testAssertReflectionEqualsWithDifferentKeysInMap() {
+        TestClass2 instance1 = new TestClass2();
+        TestClass2 instance2 = new TestClass2();
+        instance1.map = new HashMap<String, Integer>(5);
+        instance2.map = new HashMap<String, Integer>(4);
+        instance1.map.put("a", 1);
+        instance2.map.put("b", 1);
+
+        assertWithErrorAndContains(instance1, instance2, "map", "expected key");
+    }
+
+    @Test
+    public void testAssertReflectionEqualsWithDifferentValuesInMap() {
+        TestClass2 instance1 = new TestClass2();
+        TestClass2 instance2 = new TestClass2();
+        instance1.map = new HashMap<String, Integer>(5);
+        instance2.map = new HashMap<String, Integer>(4);
+        instance1.map.put("a", 1);
+        instance2.map.put("a", 2);
+
+        assertWithErrorAndContains(instance1, instance2, "map", "<1>", "<2>");
     }
 
     @Test
@@ -223,6 +274,7 @@ public class JuniterAssertTest {
         public TestClass1 circular;
         public List<Integer> ints;
         public int[] intsArray;
+        public Map<String, Integer> map;
     }
 
     @SuppressWarnings("unused")
