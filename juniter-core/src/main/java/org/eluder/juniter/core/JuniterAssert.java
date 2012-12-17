@@ -12,10 +12,10 @@ package org.eluder.juniter.core;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -35,6 +35,8 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eluder.juniter.core.util.IdentityRegistry;
@@ -172,6 +174,18 @@ public class JuniterAssert extends Assert {
                 if (iterExpected.hasNext() || iterActual.hasNext()){
                     Assert.fail("Iterable values from field '" + fromField + "' do not contain same number of items");
                 }
+            } else if (isMap(testType)) {
+                Map<?, ?> expectedMap = (Map<?, ?>) expected;
+                Map<?, ?> actualMap = (Map<?, ?>) actual;
+                if (expectedMap.size() != actualMap.size()) {
+                    Assert.fail("Maps from field '" + fromField + "' do not contain same number of entries");
+                }
+                for (Entry<?, ?> expectedEntry : expectedMap.entrySet()) {
+                    if (!actualMap.containsKey(expectedEntry.getKey())) {
+                        Assert.fail("Actual map from field '" + fromField + "' does not contain expected key " + expectedEntry.getKey().toString());
+                    }
+                    assertReflectionEquals(fromField, identityRegistry, expectedEntry.getValue(), actualMap.get(expectedEntry.getKey()), assertTransients, excludedFields);
+                }
             } else if (isAssertableType(testType)) {
                 String message = null;
                 if (fromField != null) {
@@ -235,7 +249,7 @@ public class JuniterAssert extends Assert {
     protected static final boolean isAssertableField(final String fromField, final Field field, final boolean assertTransients, final Set<String> excludedFields) {
         return ((assertTransients || !Modifier.isTransient(field.getModifiers())) &&
                 !Modifier.isStatic(field.getModifiers()) &&
-                !excludedFields.contains(getFullFieldName(fromField, field).replace(ITERABLE_INDICATOR, "") ));
+                !excludedFields.contains(getFullFieldName(fromField, field).replace(ITERABLE_INDICATOR, "")));
     }
 
     protected static final String getFullFieldName(final String fromField, final Field field) {
@@ -254,6 +268,10 @@ public class JuniterAssert extends Assert {
         return (type.isArray() ||
                 Iterable.class.isAssignableFrom(type) ||
                 Iterator.class.isAssignableFrom(type));
+    }
+
+    protected static final boolean isMap(final Class<?> type) {
+        return (Map.class.isAssignableFrom(type));
     }
 
     protected static final Iterator<?> convertToIterator(final Object instance) {
