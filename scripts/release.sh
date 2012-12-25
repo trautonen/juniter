@@ -12,11 +12,8 @@ then
 fi
 
 branch=$(git rev-parse --abbrev-ref HEAD)
-echo $branch
 type=$(echo $branch | awk 'match($0, "/") { print substr($0, 0, RSTART) }')
-echo $type
 version=$(echo $branch | awk 'match($0, "/") { print substr($0, RSTART + 1) }')
-echo $version
 
 if [ $type != "release" ] && [ $type != "hotfix" ]
 then
@@ -44,16 +41,14 @@ echo "Working in $PWD"
 echo "Press return to continue or CTRL-C to abort"
 read
 
-git flow $type start $version
-
-"Cleaning project"
+echo "Cleaning project"
 mvn clean > /dev/null
 
-"Updating license information"
+echo "Updating license information"
 mvn license:update-project-license license:update-file-header > /dev/null
 git commit -am "Updated license information."
 
-./scripts/bumb-version.sh $version
+./scripts/bump-version.sh $version
 
 echo ""
 echo "Update and commit CHANGELOG before continuing!"
