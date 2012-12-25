@@ -1,6 +1,11 @@
+Version 1.1.2
+-------------
+(*) Improved assertion error message for type compatibility check in
+    reflection assert.
+
 Version 1.1.1
 -------------
-(*) Handle maps correctly in reflection assert
+(*) Handle maps correctly in reflection assert.
 
 
 Version 1.1.0
