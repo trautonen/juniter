@@ -138,17 +138,37 @@ public class JuniterAssert extends Assert {
      * @param actual the actual instance
      */
     public static void assertTypeCompatibility(final Object expected, final Object actual) {
+        assertTypeCompatibility(null, expected, actual);
+    }
+    
+    protected static final void assertTypeCompatibility(final String fromField, final Object expected, final Object actual) {
         if (isSameOrBothNull(expected, actual)) {
             return;
         }
         if (expected != null && actual == null) {
-            Assert.fail("Expected non null instance, but actually was null");
+            StringBuilder message = new StringBuilder("Expected non null instance");
+            if (fromField != null) {
+                message.append(" from field '").append(fromField).append("'");
+            }
+            message.append(", but actually was null");
+            Assert.fail(message.toString());
         }
         if (expected == null && actual != null) {
-            Assert.fail("Expected null, but actually was non null instance");
+            StringBuilder message = new StringBuilder("Expected null");
+            if (fromField != null) {
+                message.append(" from field '").append(fromField).append("'");
+            }
+            message.append(", but actually was non null instance");
+            Assert.fail(message.toString());
         }
         if (getLeafType(expected, actual) == null) {
-            Assert.fail("Expected type compatibility with " + expected.getClass().getName() + ", but was not compatible type " + actual.getClass().getName());
+            StringBuilder message = new StringBuilder("Expected type compatibility");
+            if (fromField != null) {
+                message.append(" from field '").append(fromField).append("'");
+            }
+            message.append(" with ").append(expected.getClass().getName());
+            message.append(", but was incompatible type ").append(actual.getClass().getName());
+            Assert.fail(message.toString());
         }
     }
 
@@ -159,7 +179,7 @@ public class JuniterAssert extends Assert {
         if (identityRegistry.isRegisteredIdentity(expected, actual)) {
             return;
         }
-        assertTypeCompatibility(expected, actual);
+        assertTypeCompatibility(fromField, expected, actual);
         try {
             identityRegistry.registerIdentity(expected, actual);
             Class<?> testType = getLeafType(expected, actual);
