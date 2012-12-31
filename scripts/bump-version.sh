@@ -15,19 +15,24 @@ then
     working_dir=$working_dir/..
 fi
 
+cd $working_dir
+
 for file in "pom.xml" "README.md"
 do
-    if ! [ -f $working_dir/$file ]
+    if ! [ -f $file ]
     then
-        echo "$working_dir/$file not found, aborting bump"
+        echo "$PWD/$file not found, aborting bump"
         exit 1
     fi
 done
 
-echo "Setting version to $version in all poms"
+echo "Updating version to $version in all poms"
 mvn versions:set -DnewVersion=$version > /dev/null
 mvn versions:commit > /dev/null
 
 echo "Replacing version numbers in readme"
-sed -i.bak "s,<version>[^<]*</version>,<version>$version</version>,g" $working_dir/README.md
-rm $working_dir/README.md.bak
+sed -i "s,<version>[^<]*</version>,<version>$version</version>,g" README.md
+
+echo "Committing version changes"
+git add pom.xml */pom.xml README.md
+git commit -m "Updated to version $version."

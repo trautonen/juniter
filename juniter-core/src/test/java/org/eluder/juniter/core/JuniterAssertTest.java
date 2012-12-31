@@ -82,6 +82,20 @@ public class JuniterAssertTest {
 
         assertWithErrorAndContains(instance1, instance2, "yetAnother.number");
     }
+    
+    @Test
+    public void testAssertReflectionEqualsWithNonTypeCompatibleSubField() {
+        TestClass1 instance1 = new TestClass1();
+        TestClass1 instance2 = new TestClass1();
+        TestClass2 another1 = new TestClass2();
+        TestClass2 another2 = new TestClass2();
+        instance1.another = another1;
+        instance2.another = another2;
+        another1.typeUnsafe = "foo";
+        another2.typeUnsafe = 1;
+        
+        assertWithErrorAndContains(instance1, instance2, "another.typeUnsafe", "java.lang.String", "java.lang.Integer", "incompatible");
+    }
 
     @Test
     public void testAssertReflectionEqualsWithIgnoredField() {
@@ -230,19 +244,19 @@ public class JuniterAssertTest {
         JuniterAssert.assertTypeCompatibility(new TestClass1(), new TestClass3());
     }
 
-    @Test(expected = AssertionError.class)
+    @Test
     public void testAssertTypeCompatibilityWithIncompatibleTypes() {
-        JuniterAssert.assertTypeCompatibility(new TestClass1(), new TestClass2());
+        assertWithErrorAndContains(new TestClass1(), new TestClass2(), "TestClass1", "TestClass2", "incompatible");
     }
-
-    @Test(expected = AssertionError.class)
+    
+    @Test
     public void testAssertTypeCompatibilityWithExpectedNull() {
-        JuniterAssert.assertTypeCompatibility(null, new TestClass1());
+        assertWithErrorAndContains(null, new TestClass1(), "was non null instance");
     }
 
-    @Test(expected = AssertionError.class)
+    @Test
     public void testAssertTypeCompatibilityWithActualNull() {
-        JuniterAssert.assertTypeCompatibility(new TestClass1(), null);
+        assertWithErrorAndContains(new TestClass1(), null, "was null");
     }
 
     @Test
@@ -275,6 +289,7 @@ public class JuniterAssertTest {
         public List<Integer> ints;
         public int[] intsArray;
         public Map<String, Integer> map;
+        public Object typeUnsafe;
     }
 
     @SuppressWarnings("unused")
