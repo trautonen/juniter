@@ -38,6 +38,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 
 import com.google.inject.Inject;
+import com.google.inject.Provider;
+import com.google.inject.name.Named;
 
 @RunWith(GuiceTestRunner.class)
 public class GuiceAutoContextTestRunnerTest {
@@ -53,6 +55,13 @@ public class GuiceAutoContextTestRunnerTest {
     @ImplementedBy(ArrayList.class)
     private List<String> genericList;
 
+    @ProvidedBy(StringProvider.class)
+    @Named("strings.foo")
+    private String fooString;
+    
+    @Named("constants.int")
+    private final int constant = 10;
+    
     @Before
     public void before() {
         Mockito.when(channelMock.isOpen()).thenReturn(true);
@@ -82,6 +91,21 @@ public class GuiceAutoContextTestRunnerTest {
     public void testConstructorInjection() {
         Assert.assertEquals(42, beanUnderTest.integerListSize());
     }
+    
+    @Test
+    public void testImplementationInjection() {
+        Assert.assertNotNull(genericList);
+    }
+    
+    @Test
+    public void testProviderInjection() {
+        Assert.assertEquals("foobar", fooString);
+    }
+    
+    @Test
+    public void testConstantInjection() {
+        Assert.assertEquals(10, beanUnderTest.getSimple());
+    }
 
     public static class BeanUnderTest {
         @Inject
@@ -89,6 +113,10 @@ public class GuiceAutoContextTestRunnerTest {
 
         @Inject
         private List<String> list;
+        
+        @Inject
+        @Named("constants.int")
+        private int simple;
 
         private final List<Integer> integerList;
 
@@ -97,6 +125,10 @@ public class GuiceAutoContextTestRunnerTest {
             this.integerList = integerList;
         }
 
+        public int getSimple() {
+            return simple;
+        }
+        
         public boolean isOpen() {
             return channel.isOpen();
         }
@@ -104,9 +136,16 @@ public class GuiceAutoContextTestRunnerTest {
         public int size() {
             return list.size();
         }
-
+        
         public int integerListSize() {
             return integerList.size();
+        }
+    }
+    
+    public static class StringProvider implements Provider<String> {
+        @Override
+        public String get() {
+            return "foobar";
         }
     }
 }

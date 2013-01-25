@@ -32,8 +32,10 @@ import java.nio.channels.Channel;
 import org.eluder.juniter.core.Mock;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.runners.MethodSorters;
 import org.mockito.Mockito;
 
 import com.google.inject.AbstractModule;
@@ -42,6 +44,7 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 
 @RunWith(GuiceTestRunner.class)
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class GuiceTestRunnerTest {
 
     @Mock
