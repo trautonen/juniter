@@ -109,8 +109,6 @@ Continuous integration
 
 Travis CI builds juniter with Oracle JDK 7 and OpenJDK 6.
 
-https://travis-ci.org/trautonen/juniter
-
 [![Build Status](https://travis-ci.org/trautonen/juniter.png?branch=develop)](https://travis-ci.org/trautonen/juniter)
 
 
